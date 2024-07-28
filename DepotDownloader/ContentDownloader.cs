@@ -102,37 +102,11 @@ namespace DepotDownloader
             return false;
         }
 
-        static bool AccountHasAccess(uint depotId)
-        {
-            if (steam3 == null || steam3.steamUser.SteamID == null || (steam3.Licenses == null && steam3.steamUser.SteamID.AccountType != EAccountType.AnonUser))
-                return false;
-
-            IEnumerable<uint> licenseQuery;
-            if (steam3.steamUser.SteamID.AccountType == EAccountType.AnonUser)
-            {
-                licenseQuery = [17906];
-            }
-            else
-            {
-                licenseQuery = steam3.Licenses.Select(x => x.PackageID).Distinct();
-            }
-
-            steam3.RequestPackageInfo(licenseQuery);
-
-            foreach (var license in licenseQuery)
-            {
-                if (steam3.PackageInfo.TryGetValue(license, out var package) && package != null)
-                {
-                    if (package.KeyValues["appids"].Children.Any(child => child.AsUnsignedInteger() == depotId))
-                        return true;
-
-                    if (package.KeyValues["depotids"].Children.Any(child => child.AsUnsignedInteger() == depotId))
-                        return true;
-                }
-            }
-
-            return false;
-        }
+static bool AccountHasAccess(uint depotId)
+{
+    // Bypass DLC check - Always return true
+    return true;
+}
 
         internal static KeyValue GetSteam3AppSection(uint appId, EAppInfoSection section)
         {
